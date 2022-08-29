@@ -22,7 +22,7 @@ class UrlSerializer(serializers.Serializer):
     token = serializers.CharField(
         read_only=True, required=False, max_length=conf.TOKEN_LENGTH_STR
     )
-    long_url = serializers.CharField(required=True, max_length=500)
+    long_url = serializers.CharField(required=True, max_length=2000)
     short_url = ShortUrlField(required=False, read_only=True, source="token")
     click_count = serializers.IntegerField(required=False, read_only=True)
     click_limit = serializers.IntegerField(required=False, max_value=None, min_value=1)
