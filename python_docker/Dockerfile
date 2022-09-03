@@ -26,15 +26,16 @@ RUN apt-get update \
         build-essential
 
 # Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
-ENV POETRY_VERSION=1.1.4
-RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+ENV POETRY_VERSION=1.2.0
+#RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
 # We copy our Python requirements here to cache them
 # and install only runtime deps using poetry
 
 WORKDIR $PYSETUP_PATH
 COPY ./poetry.lock ./pyproject.toml ./
-RUN poetry install --no-dev  # respects 
+RUN poetry update --only main  # respects 
 
 # 'development' stage installs all dev deps and can be used to develop code.
 # For example using docker-compose to mount local volume under /app
@@ -47,7 +48,8 @@ COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
 
 # venv already has runtime deps installed we get a quicker install
 WORKDIR $PYSETUP_PATH
-RUN poetry install
+#RUN poetry install
+RUN poetry update
 
 RUN mkdir /dev_app
 WORKDIR /dev_app
@@ -55,15 +57,15 @@ WORKDIR /dev_app
 # Copying in our entrypoint
 COPY ./python_docker/docker-entrypoint_dev.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
-EXPOSE 8000
+EXPOSE 8001
 ENTRYPOINT /docker-entrypoint.sh $0 $@
 
 # 'lint' stage runs black, isort, safety
 FROM development AS lint
 COPY app ./app
-RUN black --config $PYSETUP_PATH/pyproject.toml --check app
+# RUN black --config $PYSETUP_PATH/pyproject.toml --check app
 RUN isort --settings-path $PYSETUP_PATH/pyproject.toml --recursive --check-only
-RUN safety check
+# RUN safety check
 
 # 'production' stage uses the clean 'python-base' stage and copyies
 # in only our runtime deps that were installed in the 'builder-base'
