@@ -21,6 +21,7 @@ if [ "$1" = "runserver" ]; then
 	printf $Cyan"Cache timeout on create -> $CACHE_TIMEOUT_CREATE\n"
 	printf $Cyan"Cache timeout on read -> $CACHE_TIMEOUT_READ\n"
 	printf $Cyan"Log Token Collision -> $LOG_TOKEN_COLLISION\n"
+	printf $Cyan"Nginx location -> $NGINX_LOCATION\n"
 
 	# This is just to make `docker-compose up` work first time
 	# Real production should run these manually
@@ -28,7 +29,7 @@ if [ "$1" = "runserver" ]; then
 	python manage.py makemigrations api --no-input
 	python manage.py migrate --no-input
 
-	gunicorn --bind 0.0.0.0:$UR_L_PORT --workers $NUM_GUNICORN_WORKERS --capture-output ur_l.wsgi:application
+	gunicorn ur_l.wsgi:application --bind 0.0.0.0:5000 --chdir=/app
 elif [ "$1" = 'manage' ]; then
 	python manage.py "${@:2}"
 elif [ "$1" = 'test' ]; then
