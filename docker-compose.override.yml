@@ -33,8 +33,6 @@ services:
     tty: true
     volumes:
       - ./app:/dev_app
-  nginx:
-    command: /bin/true
 
 volumes:
   db-data_dev:
