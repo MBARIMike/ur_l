@@ -13,7 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+
 from django.contrib import admin
 from django.urls import include, path
 
-urlpatterns = [path("admin/", admin.site.urls), path("", include("api.urls"))]
+NGINX_LOCATION = os.environ.get("NGINX_LOCATION", "")[1:]
+urlpatterns = [path(f"{NGINX_LOCATION}/admin/", admin.site.urls), path("", include("api.urls"))]

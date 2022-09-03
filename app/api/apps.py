@@ -5,6 +5,7 @@ from django.apps import AppConfig
 
 class ApiConfig(AppConfig):
     name = "api"
+    default_auto_field = 'django.db.models.BigAutoField'
 
     # Higher -> Less collisions, Lower -> Prettier
     # NOTE: migration needed when changing length.
@@ -15,9 +16,14 @@ class ApiConfig(AppConfig):
     TOKEN_LENGTH_STR = 7
     TOKEN_REGEX_MATCH = rf"(?P<token>[A-Za-z0-9+_-]{{{TOKEN_LENGTH_STR}}})"
 
-    SHORT_URL_PATH = rf"^{TOKEN_REGEX_MATCH}\/?$"
+    # Default location is root of nginx server
+    NGINX_LOCATION = os.environ.get("NGINX_LOCATION", "/")
+    if NGINX_LOCATION.startswith("/"):
+        NGINX_LOCATION = NGINX_LOCATION[1:]
 
-    API_ROOT_PATH = "api/"
+    SHORT_URL_PATH = rf"^{os.path.join(NGINX_LOCATION, TOKEN_REGEX_MATCH)}\/?$"
+
+    API_ROOT_PATH = os.path.join(NGINX_LOCATION, "api/")
     API_URL_PATH = f"{API_ROOT_PATH[:-1]}/urls/"
     API_TOKEN_PATH = rf"^{API_URL_PATH[:-1]}/{TOKEN_REGEX_MATCH}/"
     API_DOCS_PATH = f"{API_ROOT_PATH[:-1]}/docs/"

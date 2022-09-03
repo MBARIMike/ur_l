@@ -28,7 +28,8 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("TARGET_ENV") == "development"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+#ALLOWED_HOSTS = ["localhost", "127.0.0.1", "[::1]"]
+ALLOWED_HOSTS = ["*"]
 USE_X_FORWARDED_HOST = True
 
 # Application definition
@@ -121,8 +122,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
-
-STATIC_URL = "/staticfiles/"
+NGINX_LOCATION = os.environ.get("NGINX_LOCATION", "")
+STATIC_URL = os.path.join(NGINX_LOCATION, "staticfiles/")
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 
