@@ -2,8 +2,6 @@
 # DJANGO_SECRET_KEY
 # TARGET_ENV
 
-version: '3.4'
-  
 services:
   postgres:
     image: postgres:${POSTGRES_TAG:-latest}
