@@ -16,7 +16,7 @@ services:
   redis:
     image: redis:${REDIS_TAG:-latest}
   ur_l:
-    image: adamwojt/adamwojt:ur_l_${TARGET_ENV:?Target Environment}
+    image: mbarimike/mbarimike:ur_l_${TARGET_ENV:?Target Environment}
     build:
       dockerfile: ./python_docker/Dockerfile
       context: .
