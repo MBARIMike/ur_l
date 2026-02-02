@@ -1,4 +1,4 @@
-FROM python:3.8.1-slim as python-base
+FROM python:3.14-slim AS python-base
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=off \
@@ -12,21 +12,21 @@ ENV PYTHONUNBUFFERED=1 \
 
 ENV PATH="$POETRY_HOME/bin:$VENV_PATH/bin:$PATH"
 
-ENV WAIT_VERSION 2.7.2
+ENV WAIT_VERSION=2.7.2
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERSION/wait /wait
 RUN chmod +x /wait
 COPY ./python_docker/wait-for-postgres.sh /wait-for-postgres.sh
 RUN chmod +x /wait-for-postgres.sh
 
 # builder-base is used to build dependencies
-FROM python-base as builder-base
+FROM python-base AS builder-base
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
         curl \
         build-essential
 
 # Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
-ENV POETRY_VERSION=1.2.0
+##ENV POETRY_VERSION=1.2.0
 #RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | python
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
@@ -39,7 +39,7 @@ RUN poetry update --only main  # respects
 
 # 'development' stage installs all dev deps and can be used to develop code.
 # For example using docker-compose to mount local volume under /app
-FROM python-base as development
+FROM python-base AS development
 ENV TARGET_ENV=development
 
 # Copying poetry and venv into image
@@ -69,7 +69,7 @@ RUN isort --settings-path $PYSETUP_PATH/pyproject.toml --recursive --check-only
 
 # 'production' stage uses the clean 'python-base' stage and copyies
 # in only our runtime deps that were installed in the 'builder-base'
-FROM python-base as production
+FROM python-base AS production
 ENV TARGET_ENV=production
 
 COPY --from=builder-base $VENV_PATH $VENV_PATH
